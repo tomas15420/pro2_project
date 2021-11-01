@@ -3,6 +3,7 @@ package cz.uhk.pro2.models;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+
 public class Message {
     private String author;
     private String text;
@@ -11,7 +12,7 @@ public class Message {
     public static final int USER_LOGGED_IN = 1;
     public static final int USER_LOGGED_OUT = 2;
 
-    private final String AUTHOR_SYSTEM = "System";
+    private static final String AUTHOR_SYSTEM = "System";
 
     public Message(String author, String text) {
         this.author = author;

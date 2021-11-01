@@ -12,6 +12,7 @@ public class InMemoryChatClient implements ChatClient {
     private List<String> loggedUsers;
 
     private List<ActionListener> listenersLoggedUsersChanged = new ArrayList<>();
+    private List<ActionListener> listenersUpdateMessages = new ArrayList<>();
 
     public InMemoryChatClient(){
         messages = new ArrayList<>();
@@ -29,6 +30,7 @@ public class InMemoryChatClient implements ChatClient {
         loggedUsers.add(loggedUser);
         messages.add(new Message(Message.USER_LOGGED_IN,userName));
         raisEventLoggedUsersChanged();
+        raisEventUpdateMessages();
     }
 
     @Override
@@ -37,11 +39,13 @@ public class InMemoryChatClient implements ChatClient {
         loggedUser = null;
         messages.add(new Message(Message.USER_LOGGED_OUT,loggedUser));
         raisEventLoggedUsersChanged();
+        raisEventUpdateMessages();
     }
 
     @Override
     public void sendMessage(String text) {
         messages.add(new Message(loggedUser,text));
+        raisEventUpdateMessages();
     }
 
     @Override
@@ -59,9 +63,20 @@ public class InMemoryChatClient implements ChatClient {
         listenersLoggedUsersChanged.add(toAdd);
     }
 
+    @Override
+    public void addActionListenerUpdateMessages(ActionListener toAdd) {
+        listenersUpdateMessages.add(toAdd);
+    }
+
     private void raisEventLoggedUsersChanged(){
         for(ActionListener listener : listenersLoggedUsersChanged){
             listener.actionPerformed(new ActionEvent(this, 1, "listenersLoggedUsers"));
+        }
+    }
+
+    public void raisEventUpdateMessages(){
+        for(ActionListener listener : listenersUpdateMessages){
+            listener.actionPerformed(new ActionEvent(this, 1, "listenersUpdateMessage"));
         }
     }
 }

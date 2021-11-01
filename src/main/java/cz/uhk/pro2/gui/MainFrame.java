@@ -88,6 +88,7 @@ public class MainFrame extends JFrame {
         txtAreaChat.setAutoscrolls(true);
         txtAreaChat.setEnabled(false);
         JScrollPane scrollPane = new JScrollPane(txtAreaChat);
+        chatClient.addActionListenerUpdateMessages(e -> refreshMessages());
         panel.add(scrollPane);
     }
 
@@ -104,7 +105,6 @@ public class MainFrame extends JFrame {
 
             chatClient.sendMessage(text);
             txtInputMessage.setText("");
-            refreshMessages();
         });
         panel.add(btnSend);
     }
