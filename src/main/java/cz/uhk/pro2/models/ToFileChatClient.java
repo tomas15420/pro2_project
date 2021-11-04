@@ -31,13 +31,10 @@ public class ToFileChatClient implements ChatClient{
 
     public ToFileChatClient(ChatFileOperations chatFileOperations){
         gson = new GsonBuilder().setPrettyPrinting().create();
-
-        messages = new ArrayList<>();
-        loggedUsers = new ArrayList<>();
-
         this.chatFileOperations = chatFileOperations;
 
-        readMessagesFromFile();
+        messages = chatFileOperations.loadMessages();
+        loggedUsers = new ArrayList<>();
     }
 
     @Override
@@ -51,14 +48,16 @@ public class ToFileChatClient implements ChatClient{
         loggedUsers.add(loggedUser);
         addMessage(new Message(Message.USER_LOGGED_IN,userName));
         raisEventLoggedUsersChanged();
+        chatFileOperations.writeLoggedUsersToFile(loggedUsers);
     }
 
     @Override
     public void logout() {
         loggedUsers.remove(loggedUser);
-        loggedUser = null;
         addMessage(new Message(Message.USER_LOGGED_OUT,loggedUser));
         raisEventLoggedUsersChanged();
+        loggedUser = null;
+        chatFileOperations.writeLoggedUsersToFile(loggedUsers);
     }
 
     @Override
@@ -98,39 +97,9 @@ public class ToFileChatClient implements ChatClient{
         }
     }
 
-    private void addMessage(Message message){
+    private void addMessage(Message message) {
         messages.add(message);
-        writeMessagesToFile();
+        chatFileOperations.writeMessagesToFile(messages);
         raisEventUpdateMessages();
-    }
-
-    private void writeMessagesToFile(){
-        String jsonText = gson.toJson(messages);
-
-        try {
-            FileWriter writer = new FileWriter(MESSAGES_FILE);
-            writer.write(jsonText);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void readMessagesFromFile(){
-        try {
-            FileReader reader = new FileReader(MESSAGES_FILE);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            StringBuilder jsonText = new StringBuilder();
-            String line;
-            while((line = bufferedReader.readLine()) != null){
-                jsonText.append(line);
-            }
-            Type targetType = new TypeToken<ArrayList<Message>>(){}.getType();
-            messages = gson.fromJson(jsonText.toString(), targetType);
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
     }
 }

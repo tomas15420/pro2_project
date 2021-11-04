@@ -46,6 +46,8 @@ public class MainFrame extends JFrame {
         panelMain.add(panelLoggedUsers, BorderLayout.EAST);
         panelMain.add(panelFooter, BorderLayout.SOUTH);
         add(panelMain);
+
+        refreshMessages();
     }
 
     private void initLoginPanel(JPanel panel){
@@ -54,29 +56,26 @@ public class MainFrame extends JFrame {
         panel.add(txtInputName);
 
         btnLogin = new JButton("Login");
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(chatClient.isAuthenticated()){
-                    chatClient.logout();
-                    btnLogin.setText("Login");
-                    txtInputName.setEnabled(true);
-                    txtAreaChat.setEnabled(false);
+        btnLogin.addActionListener(e -> {
+            if(chatClient.isAuthenticated()){
+                chatClient.logout();
+                btnLogin.setText("Login");
+                txtInputName.setEnabled(true);
+                txtAreaChat.setEnabled(false);
+            }
+            else{
+                if(txtInputName.getText().length() <= 0){
+                    JOptionPane.showMessageDialog(null,
+                            "Enter your username",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
-                else{
-                    if(txtInputName.getText().length() <= 0){
-                        JOptionPane.showMessageDialog(null,
-                                "Enter your username",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    chatClient.login(txtInputName.getText());
-                    btnLogin.setText("Logout");
-                    txtInputName.setEnabled(false);
-                    txtAreaChat.setEnabled(true);
+                chatClient.login(txtInputName.getText());
+                btnLogin.setText("Logout");
+                txtInputName.setEnabled(false);
+                txtAreaChat.setEnabled(true);
 
-                }
             }
         });
         panel.add(btnLogin);
@@ -129,6 +128,7 @@ public class MainFrame extends JFrame {
 
     private void refreshMessages(){
         txtAreaChat.setText("");
+
         for(Message msg : chatClient.getMessages()){
             txtAreaChat.append(msg.toString());
             txtAreaChat.append("\n\n");
