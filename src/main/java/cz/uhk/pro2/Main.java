@@ -6,6 +6,7 @@ import cz.uhk.pro2.models.InMemoryChatClient;
 import cz.uhk.pro2.models.Message;
 import cz.uhk.pro2.models.ToFileChatClient;
 import cz.uhk.pro2.models.chatFileOperations.ChatFileOperations;
+import cz.uhk.pro2.models.chatFileOperations.CsvChatFileOperations;
 import cz.uhk.pro2.models.chatFileOperations.JsonChatFileOperations;
 
 public class Main {

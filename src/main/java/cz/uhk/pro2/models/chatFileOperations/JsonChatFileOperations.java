@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class JsonChatFileOperations implements ChatFileOperations{
     @Override
     public List<Message> loadMessages(){
         ArrayList<Message> msgs = new ArrayList<>();
-        StringBuilder jsonText = readJsonFile(MESSAGES_FILE);
+        StringBuilder jsonText = readFile(MESSAGES_FILE);
         if(jsonText != null){
             Type targetType = new TypeToken<ArrayList<Message>>(){}.getType();
             msgs = gson.fromJson(jsonText.toString(), targetType);
@@ -35,16 +34,16 @@ public class JsonChatFileOperations implements ChatFileOperations{
         return msgs;
     }
 
-    private StringBuilder readJsonFile(String path){
+    private StringBuilder readFile(String path){
         try {
-            StringBuilder jsonText = new StringBuilder();
+            StringBuilder content = new StringBuilder();
             FileReader reader = new FileReader(path);
             BufferedReader bufferedReader = new BufferedReader(reader);
             String line;
             while((line = bufferedReader.readLine()) != null){
-                jsonText.append(line);
+                content.append(line);
             }
-            return jsonText;
+            return content;
 
         }catch (IOException e){
             e.printStackTrace();
@@ -52,12 +51,12 @@ public class JsonChatFileOperations implements ChatFileOperations{
         return null;
     }
 
-    private void writeToJson (String path,List<?> list){
-        String jsonText = gson.toJson(list);
+    private void writeListToFile(String path, List<?> list){
+        String content = gson.toJson(list);
 
         try {
             FileWriter writer = new FileWriter(path);
-            writer.write(jsonText);
+            writer.write(content);
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -66,13 +65,13 @@ public class JsonChatFileOperations implements ChatFileOperations{
     }
     @Override
     public void writeMessagesToFile(List<Message> messages) {
-        writeToJson(MESSAGES_FILE,messages);
+        writeListToFile(MESSAGES_FILE,messages);
     }
 
     @Override
     public List<String> loadLoggedUsers() {
         ArrayList<String> usrs = new ArrayList<>();
-        StringBuilder jsonText = readJsonFile(USERS_FILE);
+        StringBuilder jsonText = readFile(USERS_FILE);
         if(jsonText != null){
             Type targetType = new TypeToken<ArrayList<String>>(){}.getType();
             usrs = gson.fromJson(jsonText.toString(), targetType);
@@ -82,6 +81,6 @@ public class JsonChatFileOperations implements ChatFileOperations{
 
     @Override
     public void writeLoggedUsersToFile(List<String> users){
-        writeToJson(USERS_FILE,users);
+        writeListToFile(USERS_FILE,users);
     }
 }

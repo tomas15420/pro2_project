@@ -35,6 +35,10 @@ public class Message {
         author = AUTHOR_SYSTEM;
     }
 
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
+
     public String getAuthor() {
         return author;
     }
@@ -49,10 +53,6 @@ public class Message {
 
     @Override
     public String toString() {
-        if(author == AUTHOR_SYSTEM){
-
-        }
-
         return String.format("[%s] %s: %s",created.format(DateTimeFormatter.ofPattern("HH:mm:ss")),author,text);
     }
 }
