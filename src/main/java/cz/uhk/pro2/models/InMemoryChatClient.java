@@ -28,23 +28,23 @@ public class InMemoryChatClient implements ChatClient {
     public void login(String userName) {
         loggedUser = userName;
         loggedUsers.add(loggedUser);
-        messages.add(new Message(Message.USER_LOGGED_IN,userName));
+        addMessage(new Message(Message.USER_LOGGED_IN,userName));
         raisEventLoggedUsersChanged();
         raisEventUpdateMessages();
     }
 
     @Override
     public void logout() {
+        addMessage(new Message(Message.USER_LOGGED_OUT,loggedUser));
         loggedUsers.remove(loggedUser);
         loggedUser = null;
-        messages.add(new Message(Message.USER_LOGGED_OUT,loggedUser));
         raisEventLoggedUsersChanged();
         raisEventUpdateMessages();
     }
 
     @Override
     public void sendMessage(String text) {
-        messages.add(new Message(loggedUser,text));
+        addMessage(new Message(loggedUser,text));
         raisEventUpdateMessages();
     }
 
@@ -66,6 +66,11 @@ public class InMemoryChatClient implements ChatClient {
     @Override
     public void addActionListenerUpdateMessages(ActionListener toAdd) {
         listenersUpdateMessages.add(toAdd);
+    }
+
+    private void addMessage(Message message){
+        messages.add(message);
+        raisEventUpdateMessages();
     }
 
     private void raisEventLoggedUsersChanged(){
