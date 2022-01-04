@@ -109,14 +109,14 @@ public class MainFrame extends JFrame {
     }
 
     private void initLoggedUsersPanel(JPanel panel){
-        String[] colNames = new String[] { "Col1", "Col2" };
-
-        Object[][] data = new Object[][] {{"1:1","1:2"},{"2:1","2:2"}};
+//        String[] colNames = new String[] { "Col1", "Col2" };
+//
+//        Object[][] data = new Object[][] {{"1:1","1:2"},{"2:1","2:2"}};
 
         //tblLoggedUsers = new JTable(data,colNames);
         loggedUsersTableModel = new LoggedUsersTableModel(chatClient);
 
-        tblLoggedUsers = new JTable(data,colNames);
+        tblLoggedUsers = new JTable();
         tblLoggedUsers.setModel(loggedUsersTableModel);
 
         chatClient.addActionListenerLoggedUsersChanged(e -> loggedUsersTableModel.fireTableDataChanged());

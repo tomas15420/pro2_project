@@ -1,6 +1,11 @@
 package cz.uhk.pro2.models;
 
+import cz.uhk.pro2.models.api.MessageResponse;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 
@@ -13,6 +18,18 @@ public class Message {
     public static final int USER_LOGGED_OUT = 2;
 
     private static final String AUTHOR_SYSTEM = "System";
+
+    public Message(ResultSet resultSet) throws SQLException {
+        author = resultSet.getString("author");
+        text = resultSet.getString("text");
+        created = resultSet.getTimestamp("created").toLocalDateTime();
+    }
+
+    public Message(MessageResponse messageResponse) {
+        author = messageResponse.getAuthor();
+        text = messageResponse.getText();
+        created = ZonedDateTime.parse(messageResponse.getCreated()).toLocalDateTime();
+    }
 
     public Message(String author, String text) {
         this.author = author;

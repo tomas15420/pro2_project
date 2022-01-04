@@ -1,22 +1,15 @@
 package cz.uhk.pro2.models;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import cz.uhk.pro2.models.chatFileOperations.ChatFileOperations;
+import cz.uhk.pro2.models.database.DatabaseOperations;
+import org.apache.derby.impl.tools.planexporter.AccessDatabase;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ToFileChatClient implements ChatClient{
+public class DatabaseChatClient implements ChatClient {
     private String loggedUser;
     private List<Message> messages;
     private List<String> loggedUsers;
@@ -24,12 +17,11 @@ public class ToFileChatClient implements ChatClient{
     private List<ActionListener> listenersLoggedUsersChanged = new ArrayList<>();
     private List<ActionListener> listenersUpdateMessages = new ArrayList<>();
 
-    ChatFileOperations chatFileOperations;
+    DatabaseOperations databaseOperations;
+    public DatabaseChatClient(DatabaseOperations databaseOperations){
+        this.databaseOperations = databaseOperations;
 
-    public ToFileChatClient(ChatFileOperations chatFileOperations){
-        this.chatFileOperations = chatFileOperations;
-
-        messages = chatFileOperations.loadMessages();
+        messages = databaseOperations.getMessages();
         loggedUsers = new ArrayList<>();
     }
 
@@ -44,21 +36,28 @@ public class ToFileChatClient implements ChatClient{
         loggedUsers.add(loggedUser);
         addMessage(new Message(Message.USER_LOGGED_IN,userName));
         raisEventLoggedUsersChanged();
-        chatFileOperations.writeLoggedUsersToFile(loggedUsers);
+        raisEventUpdateMessages();
     }
 
     @Override
     public void logout() {
+        addMessage(new Message(Message.USER_LOGGED_OUT,loggedUser));
         loggedUsers.remove(loggedUser);
         loggedUser = null;
-        addMessage(new Message(Message.USER_LOGGED_OUT,loggedUser));
         raisEventLoggedUsersChanged();
-        chatFileOperations.writeLoggedUsersToFile(loggedUsers);
+        raisEventUpdateMessages();
     }
 
     @Override
     public void sendMessage(String text) {
         addMessage(new Message(loggedUser,text));
+        raisEventUpdateMessages();
+    }
+
+    private void addMessage(Message message) {
+        messages.add(message);
+        databaseOperations.addMessage(message);
+        raisEventUpdateMessages();
     }
 
     @Override
@@ -91,11 +90,5 @@ public class ToFileChatClient implements ChatClient{
         for(ActionListener listener : listenersUpdateMessages){
             listener.actionPerformed(new ActionEvent(this, 1, "listenersUpdateMessage"));
         }
-    }
-
-    private void addMessage(Message message) {
-        messages.add(message);
-        chatFileOperations.writeMessagesToFile(messages);
-        raisEventUpdateMessages();
     }
 }
